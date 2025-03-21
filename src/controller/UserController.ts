@@ -12,7 +12,6 @@ export class UserController {
 
     async one(request: Request, response: Response, next: NextFunction) {
         const Rawurl = request.url;
-        console.log(Rawurl);
         const url = Rawurl.replace("/users", "");
 
         if(url == ""){
@@ -24,10 +23,7 @@ export class UserController {
         if (urlParams.getAll.length == 0){
             return response.status(400).json({ message: "Invalid URL" });
         }
-        // console.log(urlParams);
-        const id = parseInt(urlParams.get("id"));
-        // console.log(id);
-        // const id = parseInt(request.params.id)
+        const id = urlParams.get("id");
 
 
 
@@ -42,19 +38,41 @@ export class UserController {
     }
 
     async save(request: Request, response: Response, next: NextFunction) {
-        const { email, password, age } = request.body;
-
+        const { id, name, username, password, active, created_on, created_by, updated_on, updated_by } = request.body;
+        const userToUpdate = await this.userRepository.findOneBy({ id })
         const user = Object.assign(new User(), {
-            email,
+            id,
+            name,
+            username,
             password,
-            age
+            active,
+            created_on,
+            created_by,
+            updated_on,
+            updated_by
         })
 
-        return this.userRepository.save(user)
+        if (!userToUpdate) {
+            return await this.userRepository.save(user);
+        }
+
+        return this.userRepository.update(user.id, user)
     }
 
     async remove(request: Request, response: Response, next: NextFunction) {
-        const id = parseInt(request.params.id)
+        const Rawurl = request.url;
+        const url = Rawurl.replace("/users", "");
+
+        if(url == "" || url == "?"){
+            return response.status(400).json({ message: "Invalid URL" });
+        }
+
+        const urlParams = new URLSearchParams(url);
+        
+        if (urlParams.getAll.length == 0){
+            return response.status(400).json({ message: "Invalid URL" });
+        }
+        const id = urlParams.get("id");
 
         let userToRemove = await this.userRepository.findOneBy({ id })
 
@@ -64,7 +82,7 @@ export class UserController {
 
         await this.userRepository.remove(userToRemove)
 
-        return "user has been removed"
+        return response.status(200).json({ message: "user has been removed" });
     }
 
 }

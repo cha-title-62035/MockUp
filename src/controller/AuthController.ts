@@ -4,19 +4,22 @@ import { User } from "../entity/User"
 // import { UserController } from "./UserController"
 import * as jwt from "jsonwebtoken";
 import * as bcrypt from "bcrypt"
+import * as dotenv from "dotenv"
+
+dotenv.config();
 
 export class AuthController{
 
     private userRepository = AppDataSource.getRepository(User)
 
     async login(req: Request, res: Response, next: NextFunction) {
-        const { email, password } = req.body
-        if(!(email && password)){
+        const { username, password } = req.body
+        if(!(username && password)){
             res.status(403).json({ message: "Invalid Credentials" });
         }
         // const hashedPassword = await bcrypt.hash(password, 10)
         const check_user = await this.userRepository.findOne({
-            where: { email: email }
+            where: { username: username }
         });
 
         if(!check_user)
@@ -27,7 +30,7 @@ export class AuthController{
         const IsPasswordValid = await bcrypt.compare(password, check_user.password);
 
         if(IsPasswordValid){
-            const token = jwt.sign({user: check_user}, "TestDB", {expiresIn: "1h"});
+            const token = jwt.sign({user: check_user}, process.env.JWT_SECRET, {expiresIn: "1h"});
             let obj = {
                 //user: check_user,
                 token: token,
@@ -45,14 +48,15 @@ export class AuthController{
     }
 
     async signup(req: Request, res: Response, next: NextFunction) {
-        const { email, password, age } = req.body;
+        const { name, username, password, active } = req.body;
 
         const hashedPassword = await bcrypt.hash(password, 10)
 
         const user = Object.assign(new User(), {
-            email,
+            name,
+            username,
             password,
-            age
+            active
         })
 
         user.password = hashedPassword

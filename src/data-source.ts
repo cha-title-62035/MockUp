@@ -1,15 +1,6 @@
 import "reflect-metadata"
 import { DataSource } from "typeorm"
 import { User } from "./entity/User"
-import { Status } from "./entity/Status"
-import { Employee } from "./entity/Employee"
-import { Position } from "./entity/Position"
-import { Supplier } from "./entity/Supplier"
-import { Category } from "./entity/Category"
-import { Item } from "./entity/Item"
-import { ItemMappingSupplier } from "./entity/ItemMappingSupplier"
-import { PO_Request } from "./entity/PO_Request"
-import { PO_Item } from "./entity/PO_Item"
 import * as dotenv from "dotenv"
 
 dotenv.config();
@@ -27,7 +18,7 @@ export const AppDataSource = new DataSource({
     // database: process.env.PG_DATABASE || "test_gxe8",
     synchronize: true,
     logging: false,
-    entities: [User, Employee, Position, Supplier, Category, Item, ItemMappingSupplier, PO_Request, PO_Item, Status],
+    entities: [User],
     ssl: true,
     migrations: [],
     subscribers: [],
