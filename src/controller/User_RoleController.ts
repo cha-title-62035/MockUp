@@ -1,21 +1,21 @@
 import { AppDataSource } from "../data-source"
 import { NextFunction, Request, Response } from "express"
-import { User } from "../entity/User"
+import { User_Role } from "../entity/User_Role"
 
-export class UserController {
+export class User_RoleController {
 
-    private userRepository = AppDataSource.getRepository(User)
+    private user_roleRepository = AppDataSource.getRepository(User_Role)
 
     async all(request: Request, response: Response, next: NextFunction) {
-        return this.userRepository.find()
+        return this.user_roleRepository.find()
     }
 
     async one(request: Request, response: Response, next: NextFunction) {
         const Rawurl = request.url;
-        const url = Rawurl.replace("/user", "");
+        const url = Rawurl.replace("/user_role", "");
 
         if(url == ""){
-            return this.userRepository.find()
+            return this.user_roleRepository.find()
         }
 
         const urlParams = new URLSearchParams(url);
@@ -27,41 +27,39 @@ export class UserController {
 
 
 
-        const user = await this.userRepository.findOne({
+        const user = await this.user_roleRepository.findOne({
             where: { id }
         })
 
         if (!user) {
-            return "unregistered user"
+            return "unregistered user role"
         }
         return user
     }
 
     async save(request: Request, response: Response, next: NextFunction) {
-        const { id, name, username, password, active, created_on, created_by, updated_on, updated_by } = request.body;
-        const userToUpdate = await this.userRepository.findOneBy({ id })
-        const user = Object.assign(new User(), {
+        const { id, user_id, role_id, created_on, created_by, updated_on, updated_by } = request.body;
+        const user_roleToUpdate = await this.user_roleRepository.findOneBy({ id })
+        const user_role = Object.assign(new User_Role(), {
             id,
-            name,
-            username,
-            password,
-            active,
+            user_id,
+            role_id,
             created_on,
             created_by,
             updated_on,
             updated_by
         })
 
-        if (!userToUpdate) {
-            return await this.userRepository.save(user);
+        if (!user_roleToUpdate) {
+            return await this.user_roleRepository.save(user_role);
         }
 
-        return this.userRepository.update(user.id, user)
+        return this.user_roleRepository.update(user_role.id, user_role)
     }
 
     async remove(request: Request, response: Response, next: NextFunction) {
         const Rawurl = request.url;
-        const url = Rawurl.replace("/users", "");
+        const url = Rawurl.replace("/user_role", "");
 
         if(url == "" || url == "?"){
             return response.status(400).json({ message: "Invalid URL" });
@@ -74,15 +72,15 @@ export class UserController {
         }
         const id = urlParams.get("id");
 
-        let userToRemove = await this.userRepository.findOneBy({ id })
+        let user_roleToRemove = await this.user_roleRepository.findOneBy({ id })
 
-        if (!userToRemove) {
-            return "this user not exist"
+        if (!user_roleToRemove) {
+            return "this user role not exist"
         }
 
-        await this.userRepository.remove(userToRemove)
+        await this.user_roleRepository.remove(user_roleToRemove)
 
-        return response.status(200).json({ message: "user has been removed" });
+        return response.status(200).json({ message: "user role has been removed" });
     }
 
 }

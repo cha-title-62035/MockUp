@@ -1,10 +1,10 @@
 import { AppDataSource } from "../data-source"
 import { NextFunction, Request, Response } from "express"
-import { User } from "../entity/User"
+import { Status } from "../entity/Status"
 
-export class UserController {
+export class StatusController {
 
-    private userRepository = AppDataSource.getRepository(User)
+    private userRepository = AppDataSource.getRepository(Status)
 
     async all(request: Request, response: Response, next: NextFunction) {
         return this.userRepository.find()
@@ -12,7 +12,7 @@ export class UserController {
 
     async one(request: Request, response: Response, next: NextFunction) {
         const Rawurl = request.url;
-        const url = Rawurl.replace("/user", "");
+        const url = Rawurl.replace("/users", "");
 
         if(url == ""){
             return this.userRepository.find()
@@ -38,18 +38,13 @@ export class UserController {
     }
 
     async save(request: Request, response: Response, next: NextFunction) {
-        const { id, name, username, password, active, created_on, created_by, updated_on, updated_by } = request.body;
+        const { id, name, seq, active } = request.body;
         const userToUpdate = await this.userRepository.findOneBy({ id })
-        const user = Object.assign(new User(), {
+        const user = Object.assign(new Status(), {
             id,
             name,
-            username,
-            password,
-            active,
-            created_on,
-            created_by,
-            updated_on,
-            updated_by
+            seq,
+            active
         })
 
         if (!userToUpdate) {

@@ -1,21 +1,21 @@
 import { AppDataSource } from "../data-source"
 import { NextFunction, Request, Response } from "express"
-import { User } from "../entity/User"
+import { Material } from "../entity/Material"
 
-export class UserController {
+export class MaterialController {
 
-    private userRepository = AppDataSource.getRepository(User)
+    private materialRepository = AppDataSource.getRepository(Material)
 
     async all(request: Request, response: Response, next: NextFunction) {
-        return this.userRepository.find()
+        return this.materialRepository.find()
     }
 
     async one(request: Request, response: Response, next: NextFunction) {
         const Rawurl = request.url;
-        const url = Rawurl.replace("/user", "");
+        const url = Rawurl.replace("/material", "");
 
         if(url == ""){
-            return this.userRepository.find()
+            return this.materialRepository.find()
         }
 
         const urlParams = new URLSearchParams(url);
@@ -27,24 +27,24 @@ export class UserController {
 
 
 
-        const user = await this.userRepository.findOne({
+        const material = await this.materialRepository.findOne({
             where: { id }
         })
 
-        if (!user) {
-            return "unregistered user"
+        if (!material) {
+            return "unregistered material"
         }
-        return user
+        return material
     }
 
     async save(request: Request, response: Response, next: NextFunction) {
-        const { id, name, username, password, active, created_on, created_by, updated_on, updated_by } = request.body;
-        const userToUpdate = await this.userRepository.findOneBy({ id })
-        const user = Object.assign(new User(), {
+        const { id, code, name, type, active, created_on, created_by, updated_on, updated_by } = request.body;
+        const materialToUpdate = await this.materialRepository.findOneBy({ id })
+        const material = Object.assign(new Material(), {
             id,
+            code,
             name,
-            username,
-            password,
+            type,
             active,
             created_on,
             created_by,
@@ -52,16 +52,16 @@ export class UserController {
             updated_by
         })
 
-        if (!userToUpdate) {
-            return await this.userRepository.save(user);
+        if (!materialToUpdate) {
+            return await this.materialRepository.save(material);
         }
 
-        return this.userRepository.update(user.id, user)
+        return this.materialRepository.update(material.id, material)
     }
 
     async remove(request: Request, response: Response, next: NextFunction) {
         const Rawurl = request.url;
-        const url = Rawurl.replace("/users", "");
+        const url = Rawurl.replace("/material", "");
 
         if(url == "" || url == "?"){
             return response.status(400).json({ message: "Invalid URL" });
@@ -74,15 +74,15 @@ export class UserController {
         }
         const id = urlParams.get("id");
 
-        let userToRemove = await this.userRepository.findOneBy({ id })
+        let materialToRemove = await this.materialRepository.findOneBy({ id })
 
-        if (!userToRemove) {
-            return "this user not exist"
+        if (!materialToRemove) {
+            return "this material not exist"
         }
 
-        await this.userRepository.remove(userToRemove)
+        await this.materialRepository.remove(materialToRemove)
 
-        return response.status(200).json({ message: "user has been removed" });
+        return response.status(200).json({ message: "material has been removed" });
     }
 
 }
