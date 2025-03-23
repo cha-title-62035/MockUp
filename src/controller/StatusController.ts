@@ -4,18 +4,18 @@ import { Status } from "../entity/Status"
 
 export class StatusController {
 
-    private userRepository = AppDataSource.getRepository(Status)
+    private statusRepository = AppDataSource.getRepository(Status)
 
     async all(request: Request, response: Response, next: NextFunction) {
-        return this.userRepository.find()
+        return this.statusRepository.find()
     }
 
     async one(request: Request, response: Response, next: NextFunction) {
         const Rawurl = request.url;
-        const url = Rawurl.replace("/users", "");
+        const url = Rawurl.replace("/status", "");
 
         if(url == ""){
-            return this.userRepository.find()
+            return this.statusRepository.find()
         }
 
         const urlParams = new URLSearchParams(url);
@@ -27,36 +27,36 @@ export class StatusController {
 
 
 
-        const user = await this.userRepository.findOne({
+        const status = await this.statusRepository.findOne({
             where: { id }
         })
 
-        if (!user) {
-            return "unregistered user"
+        if (!status) {
+            return "unregistered status"
         }
-        return user
+        return status
     }
 
     async save(request: Request, response: Response, next: NextFunction) {
         const { id, name, seq, active } = request.body;
-        const userToUpdate = await this.userRepository.findOneBy({ id })
-        const user = Object.assign(new Status(), {
+        const statusToUpdate = await this.statusRepository.findOneBy({ id })
+        const status = Object.assign(new Status(), {
             id,
             name,
             seq,
             active
         })
 
-        if (!userToUpdate) {
-            return await this.userRepository.save(user);
+        if (!statusToUpdate) {
+            return await this.statusRepository.save(status);
         }
 
-        return this.userRepository.update(user.id, user)
+        return this.statusRepository.update(status.id, status)
     }
 
     async remove(request: Request, response: Response, next: NextFunction) {
         const Rawurl = request.url;
-        const url = Rawurl.replace("/users", "");
+        const url = Rawurl.replace("/status", "");
 
         if(url == "" || url == "?"){
             return response.status(400).json({ message: "Invalid URL" });
@@ -69,15 +69,15 @@ export class StatusController {
         }
         const id = urlParams.get("id");
 
-        let userToRemove = await this.userRepository.findOneBy({ id })
+        let statusToRemove = await this.statusRepository.findOneBy({ id })
 
-        if (!userToRemove) {
-            return "this user not exist"
+        if (!statusToRemove) {
+            return "this status not exist"
         }
 
-        await this.userRepository.remove(userToRemove)
+        await this.statusRepository.remove(statusToRemove)
 
-        return response.status(200).json({ message: "user has been removed" });
+        return response.status(200).json({ message: "status has been removed" });
     }
 
 }
